@@ -1,0 +1,38 @@
+site_name: TaskTiger
+site_url: 'https://tasktiger-docs.ritza.github.io'
+site_description: >-
+    A Python task queue using Redis.
+
+theme:
+  features:
+    - navigation.indexes
+    - navigation.tabs
+    - navigation.sections
+  name: material
+
+  palette:
+    primary: deep orange
+
+markdown_extensions:
+  - pymdownx.highlight
+  - pymdownx.superfences
+  - meta
+
+nav:
+  - Home: 
+    - index.md
+    - Quick Start: quick-start.md
+    - Configuration: configuration.md
+    - Task decorator: task-decorator.md
+    - Task options: task-options.md
+    - Custom retrying: custom-retrying.md
+    - Worker: workers.md
+    - Inspect, requeue and delete tasks: inspect-requeue-delete-tasks.md
+    - Pause queue processing: pause-queue-processing.md
+    - Rollbar error handling: rollbar-error-handling.md
+    - Cleaning Up Error'd Tasks: cleaning-up-errored-tasks.md
+    - Running The Test Suite: running-test-suite.md
+    - Releasing a New Version: releasing-a-new-version.md
+
+extra:
+  generator: false
