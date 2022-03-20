@@ -1,0 +1,654 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="A Python task queue using Redis.">
+      
+      
+      
+      
+        <link rel="canonical" href="https://tasktiger-docs.ritza.github.io/inspect-requeue-delete-tasks/">
+      
+      
+        
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.2.2, mkdocs-material-7.2.2+insiders-2.12.2">
+    
+    
+      
+        <title>Inspect, requeue and delete tasks - TaskTiger</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.98acb380.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.73e53a79.min.css">
+        
+          
+          
+          <meta name="theme-color" content="#ff6e42">
+        
+      
+      <link rel="preload" as="style" href="../assets/stylesheets/vendor/mermaid.733f213f.min.css">
+      
+    
+    
+    
+      
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700%7CRoboto+Mono&display=fallback">
+        <style>:root{--md-text-font-family:"Roboto";--md-code-font-family:"Roboto Mono"}</style>
+      
+    
+    
+    
+    <script>function __md_scope(e,t,_){return new URL(_||(t===localStorage?"..":".."),location).pathname+"."+e}function __md_get(e,t=localStorage,_){return JSON.parse(t.getItem(__md_scope(e,t,_)))}function __md_set(e,t,_=localStorage,o){try{_.setItem(__md_scope(e,_,o),JSON.stringify(t))}catch(e){}}</script>
+    
+      
+
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="" data-md-color-primary="deep-orange" data-md-color-accent="">
+  
+    
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="TaskTiger" class="md-header__button md-logo" aria-label="TaskTiger" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            TaskTiger
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Inspect, requeue and delete tasks
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+      </label>
+      
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" aria-label="Clear" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-tabs__inner md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+    
+  
+
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link md-tabs__link--active">
+        Home
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="TaskTiger" class="md-nav__button md-logo" aria-label="TaskTiger" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
+
+    </a>
+    TaskTiger
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_1" type="checkbox" id="__nav_1" checked>
+      
+      
+      
+        
+          
+            
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--container ">
+          <a href="..">Home</a>
+          <label for="__nav_1">
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        </div>
+      
+      <nav class="md-nav" aria-label="Home" data-md-level="1">
+        <label class="md-nav__title" for="__nav_1">
+          <span class="md-nav__icon md-icon"></span>
+          Home
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../quick-start/" class="md-nav__link">
+        Quick Start
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../configuration/" class="md-nav__link">
+        Configuration
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../task-decorator/" class="md-nav__link">
+        Task decorator
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../task-options/" class="md-nav__link">
+        Task options
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../custom-retrying/" class="md-nav__link">
+        Custom retrying
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../workers/" class="md-nav__link">
+        Worker
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        Inspect, requeue and delete tasks
+      </a>
+      
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../pause-queue-processing/" class="md-nav__link">
+        Pause queue processing
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../rollbar-error-handling/" class="md-nav__link">
+        Rollbar error handling
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cleaning-up-errored-tasks/" class="md-nav__link">
+        Cleaning Up Error'd Tasks
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../running-test-suite/" class="md-nav__link">
+        Running The Test Suite
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../releasing-a-new-version/" class="md-nav__link">
+        Releasing a New Version
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          <div class="md-content" data-md-component="content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                
+                
+                  <h1>Inspect, requeue and delete tasks</h1>
+                
+                <p>TaskTiger provides access to the <code>Task</code> class which lets you inspect
+queues and perform various actions on tasks.</p>
+<p>Each queue can have tasks in the following states:</p>
+<ul>
+<li><code>queued</code>: Tasks that are queued and waiting to be picked up by the
+    workers.</li>
+<li><code>active</code>: Tasks that are currently being processed by the workers.</li>
+<li><code>scheduled</code>: Tasks that are scheduled for later execution.</li>
+<li><code>error</code>: Tasks that failed with an error.</li>
+</ul>
+<p>To get a list of all tasks for a given queue and state, use
+<code>Task.tasks_from_queue</code>. The method gives you back a tuple containing
+the total number of tasks in the queue (useful if the tasks are
+truncated) and a list of tasks in the queue, latest first. Using the
+<code>skip</code> and <code>limit</code> keyword arguments, you can fetch arbitrary slices of
+the queue. If you know the task ID, you can fetch a given task using
+<code>Task.from_id</code>. Both methods let you load tracebacks from failed task
+executions using the <code>load_executions</code> keyword argument, which accepts
+an integer indicating how many executions should be loaded.</p>
+<p>Tasks can also be constructed and queued using the regular constructor,
+which takes the TaskTiger instance, the function name and the options
+described in the <em>Task options</em> section. The task can then be queued
+using its <code>delay</code> method. Note that the <code>when</code> argument needs to be
+passed to the <code>delay</code> method, if applicable. Unique tasks can be
+reconstructed using the same arguments.</p>
+<p>The <code>Task</code> object has the following properties:</p>
+<ul>
+<li><code>id</code>: The task ID.</li>
+<li><code>data</code>: The raw data as a dict from Redis.</li>
+<li><code>executions</code>: A list of failed task executions (as dicts). An
+    execution dict contains the processing time in <code>time_started</code> and
+    <code>time_failed</code>, the worker host in <code>host</code>, the exception name in
+    <code>exception_name</code> and the full traceback in <code>traceback</code>.</li>
+<li><code>serialized_func</code>, <code>args</code>, <code>kwargs</code>: The serialized function name
+    with all of its arguments.</li>
+<li><code>func</code>: The imported (executable) function</li>
+</ul>
+<p>The <code>Task</code> object has the following methods:</p>
+<ul>
+<li><code>cancel</code>: Cancel a scheduled task.</li>
+<li><code>delay</code>: Queue the task for execution.</li>
+<li><code>delete</code>: Remove the task from the error queue.</li>
+<li><code>execute</code>: Run the task without queueing it.</li>
+<li><code>n_executions</code>: Queries and returns the number of past task
+    executions.</li>
+<li><code>retry</code>: Requeue the task from the error queue for execution.</li>
+<li><code>update_scheduled_time</code>: Updates a scheduled task\'s date to the
+    given date.</li>
+</ul>
+<p>The current task can be accessed within the task function while it\'s
+being executed: In case of a non-batch task, the <code>current_task</code> property
+of the <code>TaskTiger</code> instance returns the current <code>Task</code> instance. In case
+of a batch task the <code>current_tasks</code> property must be used which returns
+a list of tasks that are currently being processed (in the same order as
+they were passed to the task).</p>
+<p>Example 1: Queueing a unique task and canceling it without a reference
+to the original task.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">tasktiger</span> <span class="kn">import</span> <span class="n">TaskTiger</span><span class="p">,</span> <span class="n">Task</span>
+
+<span class="n">tiger</span> <span class="o">=</span> <span class="n">TaskTiger</span><span class="p">()</span>
+
+<span class="c1"># Send an email in five minutes.</span>
+<span class="n">task</span> <span class="o">=</span> <span class="n">Task</span><span class="p">(</span><span class="n">tiger</span><span class="p">,</span> <span class="n">send_mail</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;email_id&#39;</span><span class="p">],</span> <span class="n">unique</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">task</span><span class="o">.</span><span class="n">delay</span><span class="p">(</span><span class="n">when</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">minutes</span><span class="o">=</span><span class="mi">5</span><span class="p">))</span>
+
+<span class="c1"># Unique tasks get back a task instance referring to the same task by simply</span>
+<span class="c1"># creating the same task again.</span>
+<span class="n">task</span> <span class="o">=</span> <span class="n">Task</span><span class="p">(</span><span class="n">tiger</span><span class="p">,</span> <span class="n">send_mail</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;email_id&#39;</span><span class="p">],</span> <span class="n">unique</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">task</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
+</code></pre></div>
+<p>Example 2: Inspecting queues and retrying a task by ID.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">tasktiger</span> <span class="kn">import</span> <span class="n">TaskTiger</span><span class="p">,</span> <span class="n">Task</span>
+
+<span class="n">QUEUE_NAME</span> <span class="o">=</span> <span class="s1">&#39;default&#39;</span>
+<span class="n">TASK_STATE</span> <span class="o">=</span> <span class="s1">&#39;error&#39;</span>
+<span class="n">TASK_ID</span> <span class="o">=</span> <span class="s1">&#39;6fa07a91642363593cddef7a9e0c70ae3480921231710aa7648b467e637baa79&#39;</span>
+
+<span class="n">tiger</span> <span class="o">=</span> <span class="n">TaskTiger</span><span class="p">()</span>
+
+<span class="n">n_total</span><span class="p">,</span> <span class="n">tasks</span> <span class="o">=</span> <span class="n">Task</span><span class="o">.</span><span class="n">tasks_from_queue</span><span class="p">(</span><span class="n">tiger</span><span class="p">,</span> <span class="n">QUEUE_NAME</span><span class="p">,</span> <span class="n">TASK_STATE</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">task</span> <span class="ow">in</span> <span class="n">tasks</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">task</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">task</span><span class="o">.</span><span class="n">func</span><span class="p">)</span>
+
+<span class="n">task</span> <span class="o">=</span> <span class="n">Task</span><span class="o">.</span><span class="n">from_id</span><span class="p">(</span><span class="n">tiger</span><span class="p">,</span> <span class="n">QUEUE_NAME</span><span class="p">,</span> <span class="n">TASK_STATE</span><span class="p">,</span> <span class="n">TASK_ID</span><span class="p">)</span>
+<span class="n">task</span><span class="o">.</span><span class="n">retry</span><span class="p">()</span>
+</code></pre></div>
+<p>Example 3: Accessing the task instances within a batch task function to
+determine how many times the currently processing tasks were previously
+executed.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">tasktiger</span> <span class="kn">import</span> <span class="n">TaskTiger</span>
+
+<span class="n">tiger</span> <span class="o">=</span> <span class="n">TaskTiger</span><span class="p">()</span>
+
+<span class="nd">@tiger</span><span class="o">.</span><span class="n">task</span><span class="p">(</span><span class="n">batch</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">my_task</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">task</span> <span class="ow">in</span> <span class="n">tiger</span><span class="o">.</span><span class="n">current_tasks</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">task</span><span class="o">.</span><span class="n">n_executions</span><span class="p">())</span>
+</code></pre></div>
+                
+              
+              
+                
+
+
+              
+            </article>
+            
+          </div>
+        </div>
+        
+      </main>
+      
+        
+<footer class="md-footer">
+  
+    <nav class="md-footer__inner md-grid" aria-label="Footer">
+      
+        
+        <a href="../workers/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Worker" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              Worker
+            </div>
+          </div>
+        </a>
+      
+      
+        
+        <a href="../pause-queue-processing/" class="md-footer__link md-footer__link--next" aria-label="Next: Pause queue processing" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              Pause queue processing
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+        
+        
+      </div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    <script id="__config" type="application/json">{"base": "..", "features": ["navigation.indexes", "navigation.tabs", "navigation.sections"], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../assets/javascripts/workers/search.61ac8e46.min.js", "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.218b5f82.min.js"></script>
+      
+    
+  </body>
+</html>

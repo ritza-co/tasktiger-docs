@@ -1,0 +1,679 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="A Python task queue using Redis.">
+      
+      
+      
+      
+        <link rel="canonical" href="https://tasktiger-docs.ritza.github.io/workers/">
+      
+      
+        
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.2.2, mkdocs-material-7.2.2+insiders-2.12.2">
+    
+    
+      
+        <title>Worker - TaskTiger</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.98acb380.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.73e53a79.min.css">
+        
+          
+          
+          <meta name="theme-color" content="#ff6e42">
+        
+      
+      <link rel="preload" as="style" href="../assets/stylesheets/vendor/mermaid.733f213f.min.css">
+      
+    
+    
+    
+      
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700%7CRoboto+Mono&display=fallback">
+        <style>:root{--md-text-font-family:"Roboto";--md-code-font-family:"Roboto Mono"}</style>
+      
+    
+    
+    
+    <script>function __md_scope(e,t,_){return new URL(_||(t===localStorage?"..":".."),location).pathname+"."+e}function __md_get(e,t=localStorage,_){return JSON.parse(t.getItem(__md_scope(e,t,_)))}function __md_set(e,t,_=localStorage,o){try{_.setItem(__md_scope(e,_,o),JSON.stringify(t))}catch(e){}}</script>
+    
+      
+
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="" data-md-color-primary="deep-orange" data-md-color-accent="">
+  
+    
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="TaskTiger" class="md-header__button md-logo" aria-label="TaskTiger" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            TaskTiger
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Worker
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+      </label>
+      
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" aria-label="Clear" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-tabs__inner md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+    
+  
+
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link md-tabs__link--active">
+        Home
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="TaskTiger" class="md-nav__button md-logo" aria-label="TaskTiger" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
+
+    </a>
+    TaskTiger
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_1" type="checkbox" id="__nav_1" checked>
+      
+      
+      
+        
+          
+            
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--container ">
+          <a href="..">Home</a>
+          <label for="__nav_1">
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        </div>
+      
+      <nav class="md-nav" aria-label="Home" data-md-level="1">
+        <label class="md-nav__title" for="__nav_1">
+          <span class="md-nav__icon md-icon"></span>
+          Home
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../quick-start/" class="md-nav__link">
+        Quick Start
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../configuration/" class="md-nav__link">
+        Configuration
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../task-decorator/" class="md-nav__link">
+        Task decorator
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../task-options/" class="md-nav__link">
+        Task options
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../custom-retrying/" class="md-nav__link">
+        Custom retrying
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        Worker
+      </a>
+      
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../inspect-requeue-delete-tasks/" class="md-nav__link">
+        Inspect, requeue and delete tasks
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../pause-queue-processing/" class="md-nav__link">
+        Pause queue processing
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../rollbar-error-handling/" class="md-nav__link">
+        Rollbar error handling
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cleaning-up-errored-tasks/" class="md-nav__link">
+        Cleaning Up Error'd Tasks
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../running-test-suite/" class="md-nav__link">
+        Running The Test Suite
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../releasing-a-new-version/" class="md-nav__link">
+        Releasing a New Version
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          <div class="md-content" data-md-component="content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                
+                
+                  <h1>Worker</h1>
+                
+                <p>The <code>tasktiger</code> command is used on the command line to invoke a worker.
+To invoke multiple workers, multiple instances need to be started. This
+can be easily done e.g. via Supervisor. The following Supervisor
+configuration file can be placed in <code>/etc/supervisor/tasktiger.ini</code> and
+runs 4 TaskTiger workers as the <code>ubuntu</code> user. For more information,
+read Supervisor\'s documentation.</p>
+<div class="highlight"><pre><span></span><code><span class="o">[</span>program:tasktiger<span class="o">]</span>
+<span class="nv">command</span><span class="o">=</span>/usr/local/bin/tasktiger
+<span class="nv">process_name</span><span class="o">=</span>%<span class="o">(</span>program_name<span class="o">)</span>s_%<span class="o">(</span>process_num<span class="o">)</span>02d
+<span class="nv">numprocs</span><span class="o">=</span><span class="m">4</span>
+<span class="nv">numprocs_start</span><span class="o">=</span><span class="m">0</span>
+<span class="nv">priority</span><span class="o">=</span><span class="m">999</span>
+<span class="nv">autostart</span><span class="o">=</span><span class="nb">true</span>
+<span class="nv">autorestart</span><span class="o">=</span><span class="nb">true</span>
+<span class="nv">startsecs</span><span class="o">=</span><span class="m">10</span>
+<span class="nv">startretries</span><span class="o">=</span><span class="m">3</span>
+<span class="nv">exitcodes</span><span class="o">=</span><span class="m">0</span>,2
+<span class="nv">stopsignal</span><span class="o">=</span>TERM
+<span class="nv">stopwaitsecs</span><span class="o">=</span><span class="m">600</span>
+<span class="nv">killasgroup</span><span class="o">=</span><span class="nb">false</span>
+<span class="nv">user</span><span class="o">=</span>ubuntu
+<span class="nv">redirect_stderr</span><span class="o">=</span><span class="nb">false</span>
+<span class="nv">stdout_logfile</span><span class="o">=</span>/var/log/tasktiger.out.log
+<span class="nv">stdout_logfile_maxbytes</span><span class="o">=</span>250MB
+<span class="nv">stdout_logfile_backups</span><span class="o">=</span><span class="m">10</span>
+<span class="nv">stderr_logfile</span><span class="o">=</span>/var/log/tasktiger.err.log
+<span class="nv">stderr_logfile_maxbytes</span><span class="o">=</span>250MB
+<span class="nv">stderr_logfile_backups</span><span class="o">=</span><span class="m">10</span>
+</code></pre></div>
+<p>Workers support the following options:</p>
+<ul>
+<li>
+<p><code>-q</code>, <code>--queues</code></p>
+<p>If specified, only the given queue(s) are processed. Multiple queues
+can be separated by comma. Any subqueues of the given queues will be
+also processed. For example, <code>-q first,second</code> will process items
+from <code>first</code>, <code>second</code>, and subqueues such as <code>first.CUSTOMER1</code>,
+<code>first.CUSTOMER2</code>.</p>
+</li>
+<li>
+<p><code>-e</code>, <code>--exclude-queues</code></p>
+<p>If specified, exclude the given queue(s) from processing. Multiple
+queues can be separated by comma. Any subqueues of the given queues
+will also be excluded unless a more specific queue is specified with
+the <code>-q</code> option. For example,
+<code>-q email,email.incoming.CUSTOMER1 -e email.incoming</code> will process
+items from the <code>email</code> queue and subqueues like
+<code>email.outgoing.CUSTOMER1</code> or <code>email.incoming.CUSTOMER1</code>, but not
+<code>email.incoming</code> or <code>email.incoming.CUSTOMER2</code>.</p>
+</li>
+<li>
+<p><code>-m</code>, <code>--module</code></p>
+<p>Module(s) to import when launching the worker. This improves task
+performance since the module doesn\'t have to be reimported every
+time a task is forked. Multiple modules can be separated by comma.</p>
+<p>Another way to preload modules is to set up a custom TaskTiger
+launch script, which is described below.</p>
+</li>
+<li>
+<p><code>-h</code>, <code>--host</code></p>
+<p>Redis server hostname (if different from <code>localhost</code>).</p>
+</li>
+<li>
+<p><code>-p</code>, <code>--port</code></p>
+<p>Redis server port (if different from <code>6379</code>).</p>
+</li>
+<li>
+<p><code>-a</code>, <code>--password</code></p>
+<p>Redis server password (if required).</p>
+</li>
+<li>
+<p><code>-n</code>, <code>--db</code></p>
+<p>Redis server database number (if different from <code>0</code>).</p>
+</li>
+<li>
+<p><code>-M</code>, <code>--max-workers-per-queue</code></p>
+<p>Maximum number of workers that are allowed to process a queue.</p>
+</li>
+<li>
+<p><code>--store-tracebacks/--no-store-tracebacks</code></p>
+<p>Store tracebacks with execution history (config defaults to <code>True</code>).</p>
+</li>
+</ul>
+<p>In some cases it is convenient to have a custom TaskTiger launch script.
+For example, your application may have a <code>manage.py</code> command that sets
+up the environment and you may want to launch TaskTiger workers using
+that script. To do that, you can use the <code>run_worker_with_args</code> method,
+which launches a TaskTiger worker and parses any command line arguments.
+Here is an example:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">tasktiger</span> <span class="kn">import</span> <span class="n">TaskTiger</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">command</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+    <span class="n">command</span> <span class="o">=</span> <span class="kc">None</span>
+
+<span class="k">if</span> <span class="n">command</span> <span class="o">==</span> <span class="s1">&#39;tasktiger&#39;</span><span class="p">:</span>
+    <span class="n">tiger</span> <span class="o">=</span> <span class="n">TaskTiger</span><span class="p">(</span><span class="n">setup_structlog</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="c1"># Strip the &quot;tasktiger&quot; arg when running via manage, so we can run e.g.</span>
+    <span class="c1"># ./manage.py tasktiger --help</span>
+    <span class="n">tiger</span><span class="o">.</span><span class="n">run_worker_with_args</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">:])</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+</code></pre></div>
+<p>If you\'re using <code>flask-script</code>, you can use the <code>TaskTigerCommand</code>
+provided in the <code>tasktiger.flask_script</code> module. It takes the
+<code>TaskTiger</code> instance as an argument. Tasks will have access to Flask\'s
+application context. Example:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">Flask</span>
+<span class="kn">from</span> <span class="nn">flask.ext.script</span> <span class="kn">import</span> <span class="n">Manager</span>
+<span class="kn">from</span> <span class="nn">tasktiger.flask_script</span> <span class="kn">import</span> <span class="n">TaskTigerCommand</span>
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flask</span><span class="p">()</span>
+<span class="n">manager</span> <span class="o">=</span> <span class="n">Manager</span><span class="p">(</span><span class="n">app</span><span class="p">)</span>
+<span class="n">tiger</span> <span class="o">=</span> <span class="n">TaskTiger</span><span class="p">(</span><span class="n">setup_structlog</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">manager</span><span class="o">.</span><span class="n">add_command</span><span class="p">(</span><span class="s1">&#39;tasktiger&#39;</span><span class="p">,</span> <span class="n">TaskTigerCommand</span><span class="p">(</span><span class="n">tiger</span><span class="p">))</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">manager</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</code></pre></div>
+<p>You can subclass the <code>TaskTigerCommand</code> and override the <code>setup</code> method
+to implement any custom setup that needs to be done before running the
+worker.</p>
+                
+              
+              
+                
+
+
+              
+            </article>
+            
+          </div>
+        </div>
+        
+      </main>
+      
+        
+<footer class="md-footer">
+  
+    <nav class="md-footer__inner md-grid" aria-label="Footer">
+      
+        
+        <a href="../custom-retrying/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Custom retrying" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              Custom retrying
+            </div>
+          </div>
+        </a>
+      
+      
+        
+        <a href="../inspect-requeue-delete-tasks/" class="md-footer__link md-footer__link--next" aria-label="Next: Inspect, requeue and delete tasks" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              Inspect, requeue and delete tasks
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+        
+        
+      </div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    <script id="__config" type="application/json">{"base": "..", "features": ["navigation.indexes", "navigation.tabs", "navigation.sections"], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../assets/javascripts/workers/search.61ac8e46.min.js", "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.218b5f82.min.js"></script>
+      
+    
+  </body>
+</html>
